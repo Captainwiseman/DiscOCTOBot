@@ -1,6 +1,6 @@
-const dayjs = require("dayjs");
 const { init } = require("./process");
-const fs = require('node:fs');
+const { logger } = require("./services/utils");
+const fs = require("node:fs");
 
 require("dotenv").config();
 
@@ -10,19 +10,19 @@ const client = new Client({
 });
 
 client.commands = new Collection();
-const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
+const commandFiles = fs
+  .readdirSync("./commands")
+  .filter((file) => file.endsWith(".js"));
 
 for (const file of commandFiles) {
-	const command = require(`./commands/${file}`);
-	client.commands.set(command.data.name, command);
+  const command = require(`./commands/${file}`);
+  client.commands.set(command.data.name, command);
 }
 
 // On Ready
 client.on("ready", function (e) {
-  const timestamp = dayjs().format("YYYY-MM-DD - HH:mm:ss");
-  console.log(`|${timestamp}| Bot Logged in as ${client.user.tag}!`);
-//   console.log(e);
-    init(client);
+  logger("Bot Logged in", { userTag: client.user.tag, onReadyCallback: e });
+  init(client);
 });
 
 // Authenticate & Login
